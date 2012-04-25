@@ -6,10 +6,17 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXFileReference section */
+		A701C7C51547C28900023EF2 /* BRRestMeUp.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = BRRestMeUp.php; sourceTree = "<group>"; };
+		A701C7C61547C28900023EF2 /* BRRestMeUpException.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = BRRestMeUpException.php; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
 /* Begin PBXGroup section */
 		A701C7B51547C21200023EF2 = {
 			isa = PBXGroup;
 			children = (
+				A701C7C51547C28900023EF2 /* BRRestMeUp.php */,
+				A701C7C61547C28900023EF2 /* BRRestMeUpException.php */,
 			);
 			sourceTree = "<group>";
 		};
@@ -139,6 +146,7 @@
 				A701C7C11547C21200023EF2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
