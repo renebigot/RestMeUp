@@ -33,7 +33,7 @@
         
         public function __construct($uri) {
             $this->uri = $uri;
-            
+
             if (!$this->uri) {
                 throw new BRRestMeUpException(500, "Internal server error.");
             }
@@ -47,7 +47,11 @@
             foreach ($this->routes[$method] as $route) {
                 if (preg_match($route["uri_preg"], $this->uri, $info)) {
                     $callback = $route["callback"];
-                    call_user_func(array($this, $callback), $info[1]);
+
+                    $args = explode("/", $this->uri);
+                    if (count($args) > 0 && $args[count($args)-1] == "") unset($args[count($args)-1]);
+                    call_user_func_array(array($this, $callback), $args);
+                    
                     return;
                 }
             }
