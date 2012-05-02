@@ -6,9 +6,10 @@ I'm using it in a future version of my API since I wanted a simple way to turn i
 
 #How to use ?
 
-You've got only 2 things to do : 
-1.  create a BRRestMeUp child to old your clients requests,
-2.  create a create a .htaccess to redirect URI to your BRRestMeUP child(ren).
+You've got only 2 things to do :
+
+1.   create a BRRestMeUp child to old your clients requests,
+2.   create a create a .htaccess to redirect URI to your BRRestMeUP child(ren).
 
 ##Create a BRRestMeUp child
 
