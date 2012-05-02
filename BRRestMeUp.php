@@ -28,36 +28,104 @@
      */
     include_once("BRRestMeUpException.php");
     
+    /** 
+     * BRRestMeUp is the main class for RestMeUp. To use it, simply create a class that extends BRRestMeUp.
+     * The child class must contain :
+     *    - a protected variable named $routes
+     *    - a set of methods which will be the RESTful API callbacks.
+     *
+     * @author René BIGOT (http://www.brae.fr)
+     */
     class BRRestMeUp {
+        /**
+         * @var $uri : contains the URI which should be translated thanks to $routes
+         */
         protected $uri = "";
         
+        /**
+         * @var $routes : contains the URIs map for each acceptable CRUD methods.
+         * For easier maintenance, BRRestMeUp converts :
+         *     - HTTP POST to create
+         *     - HTTP GET to read
+         *     - HTTP PUT to update
+         *     - HTTP DELETE to delete
+         *
+         * $routes definition example for a read only service : 
+         * $routes = array (
+         *                     "read" => array (
+         *                         array ("uri_preg" => "#^countries(\/*)$#", "callback" => "readCountries"),
+         *                         array ("uri_preg" => "#^countries(.*)#", "callback" => "readTowns")
+         *                 )
+         *             );
+         *
+         * @var "uri_preg" is the regular expression to translate
+         * @var "callback" is the instance method to call if the URI maps to the "uri_preg"
+         */
+        protected $routes;
+        
+        /**
+         * Constructor method build a BRRestMeUp instance.
+         * @param $uri : The URI that we want to map to a valid method
+         *
+         * @author René BIGOT (http://www.brae.fr)
+         */
         public function __construct($uri) {
+            //if $routes is not defined in the child class => 501 Error
+            if ( ! isset($this->routes) ) throw new BRRestMeUpException (501, "No routes defined in the API, please create some");
+            
+            //if no uri is provided => 501 Error
             $this->uri = $uri;
-
             if (!$this->uri) {
                 throw new BRRestMeUpException(500, "Internal server error.");
             }
             
+            //get the CRUD method name from the HTTP method
             $method = $this->getCRUDMethod();
             
+            //Execute callback
             $this->crudMe($method);
         }
         
+        /**
+         * crudMe read the $routes array to translate the URI to a know callback.
+         * If the callback is not defined for the URI in the routes, RestMeUp throw a 401 error.
+         * If the callback is defined but the callback could not be called for some reasons, RestMeUp throw a 501 error.
+         *
+         * @param $method : CRUD method name (create, read, update or delete)
+         *
+         * @author René BIGOT (http://www.brae.fr)
+         */
         protected function crudMe($method) {
+            //read each routes for $method in $routes
             foreach ($this->routes[$method] as $route) {
+                //try to match the current route to the URI
                 if (preg_match($route["uri_preg"], $this->uri, $info)) {
-                    $callback = $route["callback"];
+                    $callback = array($this, $route["callback"]);
 
                     $args = explode("/", $this->uri);
+                    //we don't care about the last / if nothing after.
                     if (count($args) > 0 && $args[count($args)-1] == "") unset($args[count($args)-1]);
-                    call_user_func_array(array($this, $callback), $args);
+
+                    //501 error if method is not callable
+                    if ( ! is_callable($callback) ) throw new BRRestMeUpException(501, "The method (" . $callback . ") you're trying to call is not implemented");
+
+                    //call the callback
+                    call_user_func_array($callback, $args);
                     
                     return;
                 }
             }
+            
+            //if we reach this point, we probably want to throw that Exception
             throw new BRRestMeUpException(401, "You are not authorized to access this resource.");
         }
         
+        /**
+         * getCRUDMethod read the HTTP method from PHP $_SERVER variable and translate it to CRUD.
+         * 
+         *
+         * @author René BIGOT (http://www.brae.fr)
+         */
         private function getCRUDMethod() {
             $method = $_SERVER['REQUEST_METHOD'];
             $override = isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']) ? $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] : (isset($_GET['method']) ? $_GET['method'] : '');
