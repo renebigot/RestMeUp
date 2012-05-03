@@ -116,4 +116,12 @@ RewriteRule ^(.*)$ /index.php?uri=$1 [L,QSA]
 
 ```
 
+##License
+RestMeUp is licensed under the BSD license.
 
+
+##About the author
+
+RestMeUp is developed and maintained by René BIGOT
+
+[![](http://www.brae.fr/wp-content/themes/BRAE2/images/logo.png)](http://www.brae.fr)
