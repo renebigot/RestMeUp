@@ -1,0 +1,13 @@
+#AddType directive is needed for some service provider to force PHP
+#AddType application/x-httpd-php5 .php
+
+#Turn RewriteEngine on
+RewriteEngine on
+
+#Try to rewrite all URI if it's not a file
+RewriteCond %{REQUEST_FILENAME} !-f
+#Try to rewrite all URI if it's not a folder
+#RewriteCond %{REQUEST_FILENAME} !-d
+
+#Rewrite URI and give it to index.php
+RewriteRule ^(.*)$ /RestMeUp/TestAPI/index.php?uri=$1 [L,QSA]
