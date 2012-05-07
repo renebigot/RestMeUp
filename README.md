@@ -21,22 +21,28 @@ Just put the following code in index.php in the root folder of your webservice.
     include_once("RestMeUp/BRRestMeUp.php");
 
     class CandiesAPI extends BRRestMeUp {
-        protected $routes = array (
-                                   "create" => array (
-                                                      array ("uri_preg" => "#^candies(.*)#", "callback" => "createCandies")
-                                                      ),
-                                   "read" => array (
-                                                    array ("uri_preg" => "#^candies(\/*)$#", "callback" => "listCandies"),
-                                                    array ("uri_preg" => "#^candies\/chocolates(\/*)#", "callback" => "listChocolates"),
-                                                    array ("uri_preg" => "#^candies(.*)#", "callback" => "listOthersCandiesType")
-                                                    ),
-                                   "update" => array (
-                                                      //don't want to be able to update candies (for some reasons)
-                                                      ),
-                                   "delete" => array (
-                                                      array ("uri_preg" => "#^candies(.*)#", "callback" => "deleteCandies")
-                                                      )
-                                   );
+        protected $routes = 
+        array (
+               "create" => array (
+                                  array ("uri_preg" => "#^candies(.*)#",
+                                         "callback" => "createCandies")
+                                  ),
+               "read" => array (
+                                array ("uri_preg" => "#^candies(\/*)$#",
+                                       "callback" => "listCandies"),
+                                array ("uri_preg" => "#^candies\/chocolates(\/*)#",
+                                       "callback" => "listChocolates"),
+                                array ("uri_preg" => "#^candies(.*)#",
+                                       "callback" => "listOthersCandiesType")
+                                ),
+               "update" => array (
+                                  //don't want updates (for some reasons)
+                                  ),
+               "delete" => array (
+                                  array ("uri_preg" => "#^candies(.*)#",
+                                         "callback" => "deleteCandies")
+                                  )
+               );
         
         //CREATE
         protected function createCandies() {
@@ -45,9 +51,13 @@ Just put the following code in index.php in the root folder of your webservice.
             
             $candiesType = "";
             
-            if ($argNumber != 3) throw new BRRestMeUpException(501, "Your request is not implemented in this API");
+            if ($argNumber != 3) {
+                $error = "Your request is not implemented in this API";
+                throw new BRRestMeUpException(501, $error);
+            }
             
-            echo "You are trying to create the " . $args[2] . " candy in the " . $args[3] . " category.";
+            echo "You are trying to create the " . $args[2];
+            echo " candy in the " . $args[3] . " category.";
         }
         
         //READ
@@ -67,7 +77,10 @@ Just put the following code in index.php in the root folder of your webservice.
             
             if ($argNumber >= 2) {
                 $candiesType = $args[1];
-                if ($candiesType != "fudge") throw new BRRestMeUpException(400, $candiesType . " candies should not be eaten !");
+                if ($candiesType != "fudge") {
+                    $error = $candiesType . " candies should not be eaten !";
+                    throw new BRRestMeUpException(400, $error);
+                }
                 echo "Your candies are : " . $candiesType . "\n";
             }
             
@@ -76,7 +89,8 @@ Just put the following code in index.php in the root folder of your webservice.
             }
             
             if ($argNumber >= 4) {
-                throw new BRRestMeUpException(403, "You don't have access to the ingredients\n");
+                $error = "You don't have access to the ingredients\n";
+                throw new BRRestMeUpException(403, $error);
             }
         }
         
@@ -87,14 +101,19 @@ Just put the following code in index.php in the root folder of your webservice.
             
             $candiesType = "";
             
-            if ($argNumber != 3) throw new BRRestMeUpException(501, "Your request is not implemented in this API");
             
-            echo "You are trying to delete the " . $args[2] . " candy in the " . $args[3] . " category.\n";
+            if ($argNumber != 3) {
+                $error = "Your request is not implemented in this API";
+                throw new BRRestMeUpException(501, $error);
+            }
+            
+            echo "You are trying to delete the " . $args[2];
+            echo " candy in the " . $args[3] . " category.\n";
         }
     }
     
     new CandiesAPI($_GET["uri"]);
-
+    
     ?>
 ```
 
