@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Restmeup : Very simple REST framework to simply create a RESTful application in PHP" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Restmeup</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/renebigot/RestMeUp">View on GitHub</a>
+
+          <h1 id="project_title">Restmeup</h1>
+          <h2 id="project_tagline">Very simple REST framework to simply create a RESTful application in PHP</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/renebigot/RestMeUp/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/renebigot/RestMeUp/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>Simply way to create a RESTful API</h1>
+
+<p>RestMeUp is a simple REST framework to simply create a RESTful application in PHP.
+I'm using it in a future version of my API since I wanted a simple way to turn it into a "real world" RESTful application.</p>
+
+<h1>How to use ?</h1>
+
+<p>You've got only 2 things to do :</p>
+
+<ol>
+<li>  create a BRRestMeUp child to hold your clients requests,</li>
+<li>  create a create a .htaccess to redirect URI to your BRRestMeUP child(ren).</li>
+</ol><h2>Create a BRRestMeUp child</h2>
+
+<p>Example, a simple API for candies (does nothing usefull but I think it's a good example).
+Just put the following code in index.php in the root folder of your webservice.</p>
+
+<div class="highlight">
+<pre><span class="cp">&lt;?php</span> 
+    <span class="k">include_once</span><span class="p">(</span><span class="s2">"RestMeUp/BRRestMeUp.php"</span><span class="p">);</span>
+
+    <span class="k">class</span> <span class="nc">CandiesAPI</span> <span class="k">extends</span> <span class="nx">BRRestMeUp</span> <span class="p">{</span>
+        <span class="k">protected</span> <span class="nv">$routes</span> <span class="o">=</span> 
+        <span class="k">array</span> <span class="p">(</span>
+               <span class="s2">"create"</span> <span class="o">=&gt;</span> <span class="k">array</span> <span class="p">(</span>
+                                  <span class="k">array</span> <span class="p">(</span><span class="s2">"uri_preg"</span> <span class="o">=&gt;</span> <span class="s2">"#^candies(.*)#"</span><span class="p">,</span>
+                                         <span class="s2">"callback"</span> <span class="o">=&gt;</span> <span class="s2">"createCandies"</span><span class="p">)</span>
+                                  <span class="p">),</span>
+               <span class="s2">"read"</span> <span class="o">=&gt;</span> <span class="k">array</span> <span class="p">(</span>
+                                <span class="k">array</span> <span class="p">(</span><span class="s2">"uri_preg"</span> <span class="o">=&gt;</span> <span class="s2">"#^candies(\/*)$#"</span><span class="p">,</span>
+                                       <span class="s2">"callback"</span> <span class="o">=&gt;</span> <span class="s2">"listCandies"</span><span class="p">),</span>
+                                <span class="k">array</span> <span class="p">(</span><span class="s2">"uri_preg"</span> <span class="o">=&gt;</span> <span class="s2">"#^candies\/chocolates(\/*)#"</span><span class="p">,</span>
+                                       <span class="s2">"callback"</span> <span class="o">=&gt;</span> <span class="s2">"listChocolates"</span><span class="p">),</span>
+                                <span class="k">array</span> <span class="p">(</span><span class="s2">"uri_preg"</span> <span class="o">=&gt;</span> <span class="s2">"#^candies(.*)#"</span><span class="p">,</span>
+                                       <span class="s2">"callback"</span> <span class="o">=&gt;</span> <span class="s2">"listOthersCandiesType"</span><span class="p">)</span>
+                                <span class="p">),</span>
+               <span class="s2">"update"</span> <span class="o">=&gt;</span> <span class="k">array</span> <span class="p">(</span>
+                                  <span class="c1">//don't want updates (for some reasons)</span>
+                                  <span class="p">),</span>
+               <span class="s2">"delete"</span> <span class="o">=&gt;</span> <span class="k">array</span> <span class="p">(</span>
+                                  <span class="k">array</span> <span class="p">(</span><span class="s2">"uri_preg"</span> <span class="o">=&gt;</span> <span class="s2">"#^candies(.*)#"</span><span class="p">,</span>
+                                         <span class="s2">"callback"</span> <span class="o">=&gt;</span> <span class="s2">"deleteCandies"</span><span class="p">)</span>
+                                  <span class="p">)</span>
+               <span class="p">);</span>
+
+        <span class="c1">//CREATE</span>
+        <span class="k">protected</span> <span class="k">function</span> <span class="nf">createCandies</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nv">$argNumber</span> <span class="o">=</span> <span class="nb">func_num_args</span><span class="p">();</span>
+            <span class="nv">$args</span> <span class="o">=</span> <span class="nb">func_get_args</span><span class="p">();</span>
+
+            <span class="nv">$candiesType</span> <span class="o">=</span> <span class="s2">""</span><span class="p">;</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$argNumber</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nv">$error</span> <span class="o">=</span> <span class="s2">"Your request is not implemented in this API"</span><span class="p">;</span>
+                <span class="k">throw</span> <span class="k">new</span> <span class="nx">BRRestMeUpException</span><span class="p">(</span><span class="mi">501</span><span class="p">,</span> <span class="nv">$error</span><span class="p">);</span>
+            <span class="p">}</span>
+
+            <span class="k">echo</span> <span class="s2">"You are trying to create the "</span> <span class="o">.</span> <span class="nv">$args</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+            <span class="k">echo</span> <span class="s2">" candy in the "</span> <span class="o">.</span> <span class="nv">$args</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">.</span> <span class="s2">" category."</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="c1">//READ</span>
+        <span class="k">protected</span> <span class="k">function</span> <span class="nf">listCandies</span><span class="p">()</span> <span class="p">{</span>
+            <span class="k">echo</span> <span class="s2">"This is a list of all known candies</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">protected</span> <span class="k">function</span> <span class="nf">listChocolates</span><span class="p">()</span> <span class="p">{</span>
+            <span class="k">echo</span> <span class="s2">"This is a list of all known candies with chocolates</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">protected</span> <span class="k">function</span> <span class="nf">listOthersCandiesType</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nv">$argNumber</span> <span class="o">=</span> <span class="nb">func_num_args</span><span class="p">();</span>
+            <span class="nv">$args</span> <span class="o">=</span> <span class="nb">func_get_args</span><span class="p">();</span>
+
+            <span class="nv">$candiesType</span> <span class="o">=</span> <span class="s2">""</span><span class="p">;</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$argNumber</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nv">$candiesType</span> <span class="o">=</span> <span class="nv">$args</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nv">$candiesType</span> <span class="o">!=</span> <span class="s2">"fudge"</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nv">$error</span> <span class="o">=</span> <span class="nv">$candiesType</span> <span class="o">.</span> <span class="s2">" candies should not be eaten !"</span><span class="p">;</span>
+                    <span class="k">throw</span> <span class="k">new</span> <span class="nx">BRRestMeUpException</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="nv">$error</span><span class="p">);</span>
+                <span class="p">}</span>
+                <span class="k">echo</span> <span class="s2">"Your candies are : "</span> <span class="o">.</span> <span class="nv">$candiesType</span> <span class="o">.</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$argNumber</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">echo</span> <span class="s2">"This is a list of all ingredients in "</span> <span class="o">.</span> <span class="nv">$args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">.</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$argNumber</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nv">$error</span> <span class="o">=</span> <span class="s2">"You don't have access to the ingredients</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+                <span class="k">throw</span> <span class="k">new</span> <span class="nx">BRRestMeUpException</span><span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="nv">$error</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="c1">//DELETE</span>
+        <span class="k">protected</span> <span class="k">function</span> <span class="nf">deleteCandies</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nv">$argNumber</span> <span class="o">=</span> <span class="nb">func_num_args</span><span class="p">();</span>
+            <span class="nv">$args</span> <span class="o">=</span> <span class="nb">func_get_args</span><span class="p">();</span>
+
+            <span class="nv">$candiesType</span> <span class="o">=</span> <span class="s2">""</span><span class="p">;</span>
+
+
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$argNumber</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nv">$error</span> <span class="o">=</span> <span class="s2">"Your request is not implemented in this API"</span><span class="p">;</span>
+                <span class="k">throw</span> <span class="k">new</span> <span class="nx">BRRestMeUpException</span><span class="p">(</span><span class="mi">501</span><span class="p">,</span> <span class="nv">$error</span><span class="p">);</span>
+            <span class="p">}</span>
+
+            <span class="k">echo</span> <span class="s2">"You are trying to delete the "</span> <span class="o">.</span> <span class="nv">$args</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+            <span class="k">echo</span> <span class="s2">" candy in the "</span> <span class="o">.</span> <span class="nv">$args</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">.</span> <span class="s2">" category.</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">new</span> <span class="nx">CandiesAPI</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s2">"uri"</span><span class="p">]);</span>
+
+    <span class="cp">?&gt;</span><span class="x"></span>
+</pre>
+</div>
+
+
+<h2>Create a .htaccess file</h2>
+
+<p>Here is a simple .htaccess wich redirects all traffic to index.php</p>
+
+<pre><code>#Turn RewriteEngine on
+RewriteEngine on
+
+#Try to rewrite all URI if it's not a file
+RewriteCond %{REQUEST_FILENAME} !-f
+#Try to rewrite all URI if it's not a folder
+#RewriteCond %{REQUEST_FILENAME} !-d
+
+#Rewrite URI and give it to index.php
+RewriteRule ^(.*)$ /index.php?uri=$1 [L,QSA]
+
+</code></pre>
+
+<h2>License</h2>
+
+<p>RestMeUp is licensed under the BSD license.</p>
+
+<h2>About the author</h2>
+
+<p>RestMeUp is developed and maintained by René BIGOT</p>
+
+<p><a href="http://www.brae.fr"><img src="http://www.brae.fr/wp-content/themes/BRAE2/images/logo.png" alt=""></a></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Restmeup maintained by <a href="https://github.com/renebigot">renebigot</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
